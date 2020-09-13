@@ -6,7 +6,7 @@ Here are some examples of for comprehension usages. Run them in a REPL and see w
 
 ## Option
 
-```
+```scala
 case class Person(name: String, age: Int)
 
 val result1: Option[Person] = 
@@ -16,6 +16,7 @@ val result1: Option[Person] =
   } yield Person(name, age)
 
 println(result1)
+// Some(Person(Bob,20))
 
 val result2: Option[Person] = 
   for {
@@ -24,11 +25,21 @@ val result2: Option[Person] =
   } yield Person(name, age)
 
 println(result2)
+// None
 ```
 
+desugared:
+```scala
+val result1: Option[Person] =
+  Some("Bob")
+    .flatMap(name =>
+      Some(20)
+        .map(age => Person(name, age))
+    )
+```
 ## Either
 
-```
+```scala
 case class Person(name: String, age: Int)
 
 case class MyError(msg: String)
@@ -40,6 +51,8 @@ val result1: Either[MyError, Person] =
   } yield Person(name, age)
 
 println(result1)
+// Right(Person(Bob,20))
+
 
 val result2: Either[MyError, Person] = 
   for {
@@ -48,11 +61,21 @@ val result2: Either[MyError, Person] =
   } yield Person(name, age)
 
 println(result2)
+// Left(MyError(empty name))
 ```
 
+desugared:
+```scala
+val result1 =
+  Right("Bob")
+    .flatMap(name =>
+      Right(20)
+        .map(age => Person(name, age))
+    )
+```
 ## Try
 
-```
+```scala
 import scala.util.Try
 
 val result1 = 
@@ -62,6 +85,7 @@ val result1 =
   } yield (one + twenty)
 
 println(result1)
+// Success(21)
 
 val result2 = 
   for {
@@ -70,4 +94,17 @@ val result2 =
   } yield (one + twenty)
 
 println(result2)
+// Failure(java.lang.NumberFormatException: For input string: "one")
+```
+
+desugared:
+```scala
+import scala.util.Try
+
+val result1 =
+  Try("1".toInt)
+    .flatMap(one =>
+      Try("20".toInt)
+        .map(twenty => (one + twenty))
+    )
 ```

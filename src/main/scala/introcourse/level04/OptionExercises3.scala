@@ -1,6 +1,6 @@
 package introcourse.level04
 
-import introcourse.level04.OptionExercises2.{HumanId, Job, JobId, findHumanById, findJobById, findJobIdByHumanId, findJobByHumanId}
+import introcourse.level04.OptionExercises2._
 
 /**
   * These exercises mirror the ones from `OptionExercises2.scala`,
@@ -18,7 +18,11 @@ object OptionExercises3 {
     * > Some(1)
     */
   def findJobIdByHumanIdUsingFor(humanId: HumanId): Option[JobId] =
-    findHumanById(humanId).flatMap(human => human.optJobId)
+    for {
+      human <- findHumanById(humanId)
+      jobId <- human.optJobId
+    } yield jobId
+//    original: findHumanById(humanId).flatMap(human => human.optJobId)
 
   /**
     * Rewrite this function using for-comprehension syntax.
@@ -27,7 +31,12 @@ object OptionExercises3 {
     * > Some(Job("Teacher", "Expert in their field"))
     */
   def findJobByHumanIdUsingFor(humanId: HumanId): Option[Job] =
-    findJobIdByHumanId(humanId).flatMap(jobId => findJobById(jobId))
+    for {
+      human <- findHumanById(humanId)
+      jobId <- human.optJobId
+      job <- findJobById(jobId)
+    } yield job
+//    original: findJobIdByHumanId(humanId).flatMap(jobId => findJobById(jobId))
 
   /**
     * Rewrite this function using for-comprehension syntax.
@@ -39,5 +48,10 @@ object OptionExercises3 {
     * > None
     */
   def findJobNameByHumanIdUsingFor(humanId: HumanId): Option[String] =
-    findJobByHumanId(humanId).map(job => job.name)
+    for {
+      human <- findHumanById(humanId)
+      jobId <- human.optJobId
+      job <- findJobById(jobId)
+    } yield job.name
+//    original: findJobByHumanId(humanId).map(job => job.name)
 }
